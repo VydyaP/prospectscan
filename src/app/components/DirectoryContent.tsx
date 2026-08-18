@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Search, Building2, MapPin, Calendar, ChevronRight, Filter, X, AlertTriangle, Globe, ArrowUpRight, SlidersHorizontal,  } from 'lucide-react';
 import { MOCK_COMPANIES, getSeverityCounts, getServiceLines, formatResearchDate, type Company, type Severity, type GNDService,  } from '@/lib/mockData';
 import SeverityBadge from '@/components/ui/SeverityBadge';
@@ -407,14 +408,18 @@ export default function DirectoryContent() {
 }
 
 function CompanyCard({ company }: { company: Company }) {
+  const router = useRouter();
   const sevCounts = getSeverityCounts(company);
   const serviceLines = getServiceLines(company);
   const hasHighGap = sevCounts.high > 0;
 
   return (
-    <Link
-      href={`/company-report?id=${company.id}`}
-      className={`kraft-card block p-4 hover:border-primary/40 hover:shadow-md transition-all duration-200 group relative overflow-hidden ${
+    <div
+      role="link"
+      tabIndex={0}
+      onClick={() => router.push(`/company-report?id=${company.id}`)}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') router.push(`/company-report?id=${company.id}`); }}
+      className={`kraft-card block p-4 hover:border-primary/40 hover:shadow-md transition-all duration-200 group relative overflow-hidden cursor-pointer ${
         hasHighGap ? 'border-l-4 border-l-severity-high' : ''
       }`}
     >
@@ -510,6 +515,7 @@ function CompanyCard({ company }: { company: Company }) {
           href={company.linkedin_url}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={(e) => e.stopPropagation()}
           className="flex items-center gap-1 text-2xs text-muted-foreground hover:text-foreground transition-colors"
         >
           <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
@@ -525,6 +531,6 @@ function CompanyCard({ company }: { company: Company }) {
           <ChevronRight size={12} />
         </span>
       </div>
-    </Link>
+    </div>
   );
 }
